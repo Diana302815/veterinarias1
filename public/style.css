@@ -1,0 +1,666 @@
+/* ===== VARIABLES Y RESET ===== */
+:root {
+    --indigo-transparente: rgba(13, 15, 148, 0.329);   /* Azul índigo para tarjetas */
+    --indigo-claro: rgba(255, 255, 255, 0.2);        /* Para campos de texto */
+    --blanco-brillante: #ffffff;
+    --blanco-suave: #fffdfd;
+    --gris-oscuro: #ffffff;
+    --negro-huella: rgba(255, 255, 255, 0);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #ffffff;  /* Fondo blanco */
+    color: var(--gris-oscuro);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* ===== HUELLAS ANIMADAS ===== */
+.huellas-fondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;  /* No interfieren con clics */
+    z-index: 0;
+    overflow: hidden;
+}
+
+.huella {
+    position: absolute;
+    font-size: 2.5rem;      /* Tamaño de la huella (puedes cambiarlo) */
+    color: var(--negro-huella);
+    animation: caminar 15s linear infinite;
+    opacity: 0.8;
+    user-select: none;
+}
+
+/* Animación de caminar (trayectorias variadas) */
+@keyframes caminar {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+        transform: translate(30vw, 10vh) rotate(45deg);
+    }
+    50% {
+        transform: translate(60vw, 30vh) rotate(90deg);
+    }
+    75% {
+        transform: translate(20vw, 70vh) rotate(135deg);
+    }
+    100% {
+        transform: translate(0, 100vh) rotate(180deg);
+    }
+}
+
+/* Variaciones para que cada huella tenga su propio ritmo */
+.huella:nth-child(1) { animation-duration: 12s; top: -10%; left: 5%; }
+.huella:nth-child(2) { animation-duration: 18s; top: -20%; left: 30%; animation-delay: -2s; }
+.huella:nth-child(3) { animation-duration: 22s; top: -5%; left: 60%; animation-delay: -5s; }
+.huella:nth-child(4) { animation-duration: 14s; top: -15%; left: 80%; animation-delay: -1s; }
+.huella:nth-child(5) { animation-duration: 20s; top: -30%; left: 15%; animation-delay: -7s; }
+.huella:nth-child(6) { animation-duration: 25s; top: -25%; left: 45%; animation-delay: -3s; }
+/* Puedes añadir más si quieres */
+
+/* ===== LOGOS ===== */
+.logo-cliente {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    max-width: 150px;
+}
+
+.logo-cliente img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.logo-taskify-link {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.logo-taskify-link:hover {
+    opacity: 1;
+}
+
+.logo-taskify-link img {
+    width: 80px;  /* Ajusta según tu logo */
+    height: auto;
+    display: block;
+}
+
+/* ===== VIDEO DE FONDO (opcional) ===== */
+.background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}
+
+.background-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.section {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+}
+
+.section.active {
+    display: block;
+}
+
+/* ===== TARJETAS (preguntas, datos, calendario, confirmación) ===== */
+.card,
+.pregunta-card,
+.datos-card,
+.calendario-card,
+.confirmacion-card {
+    background: var(--indigo-transparente);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--blanco-brillante);
+}
+
+/* Títulos dentro de las tarjetas */
+.card h2,
+.pregunta-card h2,
+.datos-card h2,
+.calendario-card h2,
+.confirmacion-card h2,
+.stage-number {
+    color: var(--blanco-brillante);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+.stage-number {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    display: block;
+    opacity: 0.9;
+}
+
+/* ===== OPCIONES (botones de respuesta) ===== */
+.opciones-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.opcion {
+    background: var(--indigo-claro);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--blanco-suave);
+}
+
+.opcion:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: var(--blanco-brillante);
+    color: var(--blanco-brillante);
+}
+
+.opcion.seleccionada {
+    background: rgba(255, 255, 255, 0.4);
+    border-color: var(--blanco-brillante);
+    color: var(--blanco-brillante);
+    font-weight: bold;
+}
+
+/* ===== CAMPOS DE TEXTO ===== */
+.card input,
+.card textarea,
+.card select,
+.text-input,
+.edad-selector {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    background: var(--indigo-claro);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    color: var(--blanco-suave);
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.card input:focus,
+.card textarea:focus,
+.text-input:focus,
+.edad-selector:focus {
+    outline: none;
+    border-color: var(--blanco-brillante);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ===== BARRA DE PROGRESO ===== */
+.progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    margin: 20px 0 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--blanco-brillante);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.pasos-indicador {
+    text-align: right;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== INFO IMPORTANTE (aceptación de tarifas) ===== */
+.info-importante {
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--blanco-brillante);
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+    color: var(--blanco-suave);
+}
+
+.info-importante p {
+    margin-bottom: 10px;
+}
+
+.info-importante label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+/* ===== BOTONES PRINCIPALES ===== */
+.btn-primario {
+    background: rgba(75, 0, 130, 0.8);
+    border: 1px solid var(--blanco-brillante);
+    color: var(--blanco-brillante);
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.btn-primario:hover {
+    background: rgba(75, 0, 130, 1);
+    transform: scale(1.02);
+}
+
+.btn-primario:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== CALENDARIO ===== */
+.calendario-card {
+    text-align: center;
+}
+
+#calendario-container {
+    margin: 20px 0;
+}
+
+.calendario-mes {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    backdrop-filter: blur(5px);
+}
+
+.dias-semana {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--blanco-brillante);
+    text-align: center; /* Asegura que el texto esté centrado */
+    font-size: 1rem; /* Ajusta el tamaño si es necesario */
+}
+
+.dias-semana span {
+    display: block;
+    padding: 5px;
+}
+
+.dias-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.dia {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+    color: var(--blanco-suave);
+    font-weight: 500;
+}
+
+.dia:hover:not(.vacio) {
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--blanco-brillante);
+}
+
+.dia.seleccionado {
+    background: var(--blanco-brillante);
+    color: var(--gris-oscuro);
+    font-weight: bold;
+    border: 2px solid var(--blanco-brillante);
+}
+
+.dia.vacio {
+    background: transparent;
+    cursor: default;
+}
+
+.dia.disponible {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.horario {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: var(--blanco-suave);
+}
+
+.horario:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: var(--blanco-brillante);
+    color: var(--blanco-brillante);
+}
+
+.horario.seleccionado {
+    background: var(--blanco-brillante);
+    color: var(--gris-oscuro);
+    border-color: var(--blanco-brillante);
+    font-weight: 600;
+}
+
+/* ===== BOTÓN WHATSAPP ===== */
+.btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    color: white;
+    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    margin: 20px 0;
+    transition: background 0.3s;
+}
+
+.btn-whatsapp:hover {
+    background: #128C7E;
+}
+
+.nota {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .card,
+    .pregunta-card,
+    .datos-card,
+    .calendario-card,
+    .confirmacion-card {
+        padding: 20px;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+    .opciones-grid {
+        grid-template-columns: 1fr;
+    }
+    .horarios-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    /* ===== LOGO DENTRO DE LA TARJETA ===== */
+/* Logo dentro de las tarjetas */
+.logo-tarjeta {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo-tarjeta img {
+    max-width: 120px;  /* Ajusta el tamaño según tu logo */
+    height: auto;
+    display: inline-block;
+}
+    .logo-taskify-link img {
+        width: 60px;
+    }
+}
+/* Logo dentro de las tarjetas */
+.logo-tarjeta {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo-tarjeta img {
+    max-width: 120px;  /* Ajusta el tamaño según tu logo */
+    height: auto;
+    display: inline-block;
+}
+.music-control {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+}
+
+.music-control button {
+    background: var(--indigo-transparente);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 30px;
+    padding: 10px 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.95rem;
+}
+
+.music-control button:hover {
+    background: rgba(75, 0, 130, 0.6);
+    border-color: white;
+}
+/* ===== MEJORAS EN LA TARJETA DE CONFIRMACIÓN ===== */
+.confirmacion-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    padding: 40px 30px;
+}
+
+.confirmacion-card i {
+    font-size: 5rem !important;
+    color: var(--blanco-brillante) !important;
+    margin-bottom: 25px;
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 50%;
+}
+
+.confirmacion-card h2 {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    color: var(--blanco-brillante);
+}
+
+.confirmacion-card p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    max-width: 80%;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.9);
+}
+
+/* Botón de WhatsApp más grande y centrado */
+.btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: #25D366;
+    color: white;
+    text-decoration: none;
+    padding: 18px 45px;
+    border-radius: 60px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 auto 25px;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+    width: auto;
+    min-width: 280px;
+}
+
+.btn-whatsapp:hover {
+    background: #128C7E;
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(18, 140, 126, 0.4);
+}
+
+.btn-whatsapp i {
+    font-size: 1.8rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.nota {
+    text-align: center;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.8);
+    max-width: 90%;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* ===== MEJORAS EN LA CASILLA DE VERIFICACIÓN ===== */
+.info-importante {
+    background: rgba(255,255,255,0.1);
+    border-left: 4px solid var(--blanco-brillante);
+    padding: 20px;
+    margin: 25px 0;
+    border-radius: 0 12px 12px 0;
+    text-align: left;
+}
+
+.info-importante p {
+    margin-bottom: 15px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.95);
+}
+
+.info-importante label {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: white;
+}
+
+/* Casilla de verificación más grande */
+.info-importante input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    accent-color: var(--blanco-brillante);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Para navegadores que no soportan accent-color, damos alternativa */
+.info-importante input[type="checkbox"]:checked {
+    background-color: white;
+    border-color: white;
+}
+
+/* Ajuste responsive para móvil */
+@media (max-width: 600px) {
+    .confirmacion-card {
+        padding: 30px 20px;
+        min-height: auto;
+    }
+    
+    .confirmacion-card h2 {
+        font-size: 1.8rem;
+    }
+    
+    .confirmacion-card p {
+        max-width: 100%;
+        font-size: 1rem;
+    }
+    
+    .btn-whatsapp {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .info-importante label {
+        font-size: 1rem;
+        gap: 10px;
+    }
+    
+    .info-importante input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+    }
+}
